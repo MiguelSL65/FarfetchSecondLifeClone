@@ -1,7 +1,10 @@
 package com.luxclusifmiguel.challenge.backend.controller;
 
+import com.luxclusifmiguel.challenge.backend.converters.CustomerDtoToCustomer;
+import com.luxclusifmiguel.challenge.backend.converters.CustomerToCustomerDto;
 import com.luxclusifmiguel.challenge.backend.converters.ProductDtoToProduct;
 import com.luxclusifmiguel.challenge.backend.converters.ProductToProductDto;
+import com.luxclusifmiguel.challenge.backend.dto.CustomerDto;
 import com.luxclusifmiguel.challenge.backend.dto.ProductDto;
 import com.luxclusifmiguel.challenge.backend.exceptions.ProductNotFoundException;
 import com.luxclusifmiguel.challenge.backend.exceptions.UserNotFoundException;
@@ -9,6 +12,7 @@ import com.luxclusifmiguel.challenge.backend.model.Product;
 import com.luxclusifmiguel.challenge.backend.model.Customer;
 import com.luxclusifmiguel.challenge.backend.services.ProductService;
 import com.luxclusifmiguel.challenge.backend.services.UserService;
+import com.luxclusifmiguel.challenge.backend.util.CustomerAndProduct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,6 +38,18 @@ public class ProductController {
     private ProductService productService;
     private ProductDtoToProduct productDtoToProduct;
     private ProductToProductDto productToProductDto;
+    private CustomerDtoToCustomer customerDtoToCustomer;
+    private CustomerToCustomerDto customerToCustomerDto;
+
+    @Autowired
+    public void setCustomerDtoToCustomer(CustomerDtoToCustomer customerDtoToCustomer) {
+        this.customerDtoToCustomer = customerDtoToCustomer;
+    }
+
+    @Autowired
+    public void setCustomerToCustomerDto(CustomerToCustomerDto customerToCustomerDto) {
+        this.customerToCustomerDto = customerToCustomerDto;
+    }
 
     /***
      * Sets the converter for converting between Product DTO and Product model objects
@@ -124,37 +140,30 @@ public class ProductController {
     /**
      * Adds a product
      *
-     * @param uid the user id
+     * @param uid the customer id
      * @param productDto the product DTO
-     * @param bindingResult the binding result object
-     * @param uriComponentsBuilder the uri components builder object
      * @return the response entity
      */
-    @PostMapping("/{uid}/product")
-    public ResponseEntity<?> addProduct(@PathVariable Integer uid, @Valid @RequestBody ProductDto productDto,
-                                        BindingResult bindingResult, UriComponentsBuilder uriComponentsBuilder) {
+    @PostMapping("/{uid}")
+    public Product addProduct(@PathVariable Integer uid, @Valid @RequestBody ProductDto productDto)
+            throws UserNotFoundException {
 
-        if (bindingResult.hasErrors() || productDto.getId() != null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-
-            Product product = userService.addProduct(uid, productDtoToProduct.convert(productDto));
-
-            UriComponents uriComponents = uriComponentsBuilder.path("/api/user/" + uid + "/product" +
-                    product.getId()).build();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(uriComponents.toUri());
-
-            return new ResponseEntity<>(headers, HttpStatus.CREATED);
-
-        } catch (UserNotFoundException ex) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        }
+            return userService.addProduct(uid, productDtoToProduct.convert(productDto));
     }
+
+    @PostMapping("/add")
+    public CustomerAndProduct addFormData
+            (@RequestBody CustomerAndProduct customerAndProduct)
+            throws UserNotFoundException {
+
+            Customer customer = customerAndProduct.getCustomer();
+            Product product = customerAndProduct.getProduct();
+
+            userService.save(customer);
+            userService.addProduct(customer.getId(), product);
+
+            return new CustomerAndProduct(customer, product);
+        }
 
     /**
      * Removes a product
