@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- * The {@link Product} data transfer object
+ * The {@link com.luxclusifmiguel.challenge.backend.model.Product} data transfer object
  */
 public class ProductDto {
 

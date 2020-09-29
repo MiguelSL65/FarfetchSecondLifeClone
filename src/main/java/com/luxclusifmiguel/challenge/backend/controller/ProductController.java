@@ -1,33 +1,36 @@
 package com.luxclusifmiguel.challenge.backend.controller;
 
+import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.AppendValuesResponse;
+import com.google.api.services.sheets.v4.model.ValueRange;
 import com.luxclusifmiguel.challenge.backend.converters.CustomerDtoToCustomer;
 import com.luxclusifmiguel.challenge.backend.converters.CustomerToCustomerDto;
 import com.luxclusifmiguel.challenge.backend.converters.ProductDtoToProduct;
 import com.luxclusifmiguel.challenge.backend.converters.ProductToProductDto;
-import com.luxclusifmiguel.challenge.backend.dto.CustomerDto;
 import com.luxclusifmiguel.challenge.backend.dto.ProductDto;
 import com.luxclusifmiguel.challenge.backend.exceptions.ProductNotFoundException;
 import com.luxclusifmiguel.challenge.backend.exceptions.UserNotFoundException;
-import com.luxclusifmiguel.challenge.backend.model.Product;
 import com.luxclusifmiguel.challenge.backend.model.Customer;
+import com.luxclusifmiguel.challenge.backend.model.Product;
 import com.luxclusifmiguel.challenge.backend.services.ProductService;
 import com.luxclusifmiguel.challenge.backend.services.UserService;
-import com.luxclusifmiguel.challenge.backend.util.CustomerAndProduct;
+import com.luxclusifmiguel.challenge.backend.dto.CustomerAndProductDto;
+import com.luxclusifmiguel.challenge.backend.util.SheetsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * REST controller responsible for {@link Product} related CRUD operations
+ * REST controller responsible for {@link com.luxclusifmiguel.challenge.backend.model.Product} related CRUD operations
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -124,7 +127,7 @@ public class ProductController {
     @GetMapping("/{uid}/product/{pid}")
     public ResponseEntity<ProductDto> showUserProduct(@PathVariable Integer uid, @PathVariable Integer pid) {
 
-        Product product = productService.get(pid);
+        com.luxclusifmiguel.challenge.backend.model.Product product = productService.get(pid);
 
         if (product == null || product.getUser() == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -145,24 +148,40 @@ public class ProductController {
      * @return the response entity
      */
     @PostMapping("/{uid}")
-    public Product addProduct(@PathVariable Integer uid, @Valid @RequestBody ProductDto productDto)
+    public com.luxclusifmiguel.challenge.backend.model.Product addProduct(@PathVariable Integer uid, @Valid @RequestBody ProductDto productDto)
             throws UserNotFoundException {
 
             return userService.addProduct(uid, productDtoToProduct.convert(productDto));
     }
 
     @PostMapping("/add")
-    public CustomerAndProduct addFormData
-            (@RequestBody CustomerAndProduct customerAndProduct)
-            throws UserNotFoundException {
+    public CustomerAndProductDto addFormData
+            (@RequestBody CustomerAndProductDto customerAndProductDto)
+            throws UserNotFoundException, IOException, GeneralSecurityException {
 
-            Customer customer = customerAndProduct.getCustomer();
-            Product product = customerAndProduct.getProduct();
+            Customer customer = customerAndProductDto.getCustomer();
+            Product product = customerAndProductDto.getProduct();
 
             userService.save(customer);
             userService.addProduct(customer.getId(), product);
 
-            return new CustomerAndProduct(customer, product);
+            Sheets sheetsService = SheetsUtil.getSheetsService();
+
+            ValueRange appendBody = new ValueRange()
+                .setValues(Collections.singletonList(
+                        Arrays.asList(customer.getFirstName(), customer.getLastName(), customer.getEmail(),
+                                customer.getCountry(), customer.getPhone(), product.getBrand(),
+                                product.getCondition(), product.getSize())
+                ));
+
+            AppendValuesResponse appendResult = sheetsService.spreadsheets().values()
+                .append(SheetsUtil.SPREADSHEET_ID, "challenge", appendBody)
+                .setValueInputOption("USER_ENTERED")
+                .setInsertDataOption("INSERT_ROWS")
+                .setIncludeValuesInResponse(true)
+                .execute();
+
+            return new CustomerAndProductDto(customer, product);
         }
 
     /**

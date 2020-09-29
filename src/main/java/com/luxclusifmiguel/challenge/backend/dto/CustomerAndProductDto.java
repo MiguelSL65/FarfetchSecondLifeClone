@@ -1,14 +1,22 @@
-package com.luxclusifmiguel.challenge.backend.util;
+package com.luxclusifmiguel.challenge.backend.dto;
 
 import com.luxclusifmiguel.challenge.backend.model.Customer;
 import com.luxclusifmiguel.challenge.backend.model.Product;
 
-public class CustomerAndProduct {
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
+public class CustomerAndProductDto {
+
+    @NotNull
+    @NotBlank
     private Customer customer;
+
+    @NotNull
+    @NotBlank
     private Product product;
 
-    public CustomerAndProduct(Customer customer, Product product) {
+    public CustomerAndProductDto(Customer customer, Product product) {
         this.customer = customer;
         this.product = product;
     }
@@ -31,7 +39,7 @@ public class CustomerAndProduct {
 
     @Override
     public String toString() {
-        return "CustomerAndProduct{" +
+        return "CustomerAndProductDto{" +
                 "customer=" + customer +
                 ", product=" + product +
                 '}';

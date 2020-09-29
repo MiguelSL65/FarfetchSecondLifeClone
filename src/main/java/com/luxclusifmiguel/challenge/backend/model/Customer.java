@@ -169,6 +169,6 @@ public class Customer extends AbstractModel {
                 ", phone='" + phone + '\'' +
                 ", country='" + country + '\'' +
                 ", products=" + products +
-                '}' + super.toString();
+                '}';
     }
 }

@@ -1,17 +1,16 @@
 package com.luxclusifmiguel.challenge.backend.converters;
 
 import com.luxclusifmiguel.challenge.backend.dto.ProductDto;
-import com.luxclusifmiguel.challenge.backend.model.Product;
 import com.luxclusifmiguel.challenge.backend.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * A {@link Converter} implementation, responsible for {@link ProductDto} to {@link Product} type conversion
+ * A {@link Converter} implementation, responsible for {@link ProductDto} to {@link com.luxclusifmiguel.challenge.backend.model.Product} type conversion
  */
 @Component
-public class ProductDtoToProduct extends AbstractConverter<ProductDto, Product> {
+public class ProductDtoToProduct extends AbstractConverter<ProductDto, com.luxclusifmiguel.challenge.backend.model.Product> {
 
     private ProductService productService;
 
@@ -32,9 +31,9 @@ public class ProductDtoToProduct extends AbstractConverter<ProductDto, Product> 
      * @return the product object model
      */
     @Override
-    public Product convert(ProductDto productDto) {
+    public com.luxclusifmiguel.challenge.backend.model.Product convert(ProductDto productDto) {
 
-        Product product = (productDto.getId() != null ? productService.get(productDto.getId()) : new Product());
+        com.luxclusifmiguel.challenge.backend.model.Product product = (productDto.getId() != null ? productService.get(productDto.getId()) : new com.luxclusifmiguel.challenge.backend.model.Product());
 
         product.setBrand(productDto.getBrand());
         product.setCondition(productDto.getCondition());
