@@ -1,14 +1,15 @@
 package com.luxclusifmiguel.challenge.backend.converters;
 
 import com.luxclusifmiguel.challenge.backend.dto.CustomerDto;
+import com.luxclusifmiguel.challenge.backend.model.Customer;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * A {@link Converter} implementation, responsible for {@link com.luxclusifmiguel.challenge.backend.model.Customer} to {@link CustomerDto} type conversion
+ * A {@link Converter} implementation, responsible for {@link Customer} to {@link CustomerDto} type conversion
  */
 @Component
-public class CustomerToCustomerDto extends AbstractConverter<com.luxclusifmiguel.challenge.backend.model.Customer, CustomerDto> {
+public class CustomerToCustomerDto extends AbstractConverter<Customer, CustomerDto> {
 
     /**
      * Converts the customer model object into a customer DTO
@@ -17,7 +18,7 @@ public class CustomerToCustomerDto extends AbstractConverter<com.luxclusifmiguel
      * @return the customer DTO
      */
     @Override
-    public CustomerDto convert(com.luxclusifmiguel.challenge.backend.model.Customer customer) {
+    public CustomerDto convert(Customer customer) {
 
         CustomerDto customerDto = new CustomerDto();
 

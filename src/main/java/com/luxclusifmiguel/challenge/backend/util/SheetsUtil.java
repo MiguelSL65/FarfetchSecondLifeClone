@@ -6,25 +6,45 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.InputStreamContent;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.luxclusifmiguel.challenge.backend.model.Customer;
+import com.luxclusifmiguel.challenge.backend.model.Product;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
+/**
+ * Util class that provides the methods to store info on a google sheet
+ * or images in a driver folder
+ */
 public class SheetsUtil {
 
     public static final String APPLICATION_NAME = "challenge";
     public static final String SPREADSHEET_ID = "1CO2FfKojdhEvvI8xML2Mpdw9gqs0TT0ZG003eYGhhuA";
 
+    /**
+     * Method to get the credentials from google
+     *
+     * @return the credentials
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
     private static Credential authorize() throws IOException, GeneralSecurityException {
         InputStream in = SheetsUtil.class.getResourceAsStream("/credentials.json");
 
@@ -41,18 +61,94 @@ public class SheetsUtil {
                 .setAccessType("offline")
                 .build();
 
-        Credential credential = new AuthorizationCodeInstalledApp(
+        return new AuthorizationCodeInstalledApp(
                 flow, new LocalServerReceiver())
                 .authorize("user");
-
-        return credential;
     }
 
-    public static Sheets getSheetsService() throws IOException, GeneralSecurityException {
+    /**
+     * Gets the sheet service
+     *
+     * @return the sheet
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
+    private static Sheets getSheetsService() throws IOException, GeneralSecurityException {
         Credential credential = authorize();
         return new Sheets.Builder(GoogleNetHttpTransport.newTrustedTransport(),
                 JacksonFactory.getDefaultInstance(), credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
     }
+
+    /**
+     * Writes info to google sheets
+     *
+     * @param customer customer info to be written
+     * @param product product ingo to be written
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
+    public static void addToSheet(Customer customer, Product product)
+            throws IOException, GeneralSecurityException {
+
+        Sheets sheetsService = SheetsUtil.getSheetsService();
+
+        ValueRange appendBody = new ValueRange()
+                .setValues(Collections.singletonList(
+                        Arrays.asList(customer.getFirstName(), customer.getLastName(), customer.getEmail(),
+                                customer.getCountry(), customer.getPhone(), product.getBrand(),
+                                product.getCondition(), product.getSize())
+                ));
+
+        sheetsService.spreadsheets().values()
+                .append(SheetsUtil.SPREADSHEET_ID, "challenge", appendBody)
+                .setValueInputOption("USER_ENTERED")
+                .setInsertDataOption("INSERT_ROWS")
+                .setIncludeValuesInResponse(true)
+                .execute();
+    }
+
+    /**
+     * Get google drive service
+     *
+     * @return the Drive
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
+    private static Drive getDriveServices() throws IOException, GeneralSecurityException {
+
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+        // instantiating a client
+        return new Drive.Builder(HTTP_TRANSPORT, JacksonFactory.getDefaultInstance(), authorize())
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+    }
+
+    /**
+     * Writes a file to a google driver folder
+     *
+     * @param multipartFile the file to write
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
+    public static void addToDrive(MultipartFile multipartFile) throws IOException, GeneralSecurityException {
+
+        File fileMetadata = new File();
+        fileMetadata.setName(multipartFile.getName());
+
+        fileMetadata.setParents(Collections.singletonList("images"));
+        fileMetadata.setMimeType("application/photo");
+
+        byte[] photoBytes = Base64.getDecoder().decode(multipartFile.getBytes());
+        InputStream inputStream = new ByteArrayInputStream(photoBytes);
+        InputStreamContent mediaContent = new InputStreamContent("application/photo", inputStream);
+
+        getDriveServices().files().create(fileMetadata, mediaContent)
+                .setSupportsTeamDrives(true)
+                .execute();
+    }
+
+
 }

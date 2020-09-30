@@ -22,7 +22,8 @@ class SellingForm extends Component {
         phone: "",
         brand: "",
         condition: "",
-        size: ""
+        size: "",
+        images: []
     }
 
     resetForm = () => {
@@ -44,6 +45,10 @@ class SellingForm extends Component {
             brand: this.state.brand,
             condition: this.state.condition,
             size: this.state.size
+        }
+
+        const imageData = {
+            images: this.state.images
         }
 
         let params = {
@@ -69,7 +74,7 @@ class SellingForm extends Component {
 
     render() {
 
-        const { firstName, lastName, email, country, phone, brand, condition, size } = this.state;
+        const { firstName, lastName, email, country, phone, brand, condition, size, images } = this.state;
 
         return (
             <div>
@@ -160,10 +165,21 @@ class SellingForm extends Component {
                                         placeholder="Small, Medium, Large" />
                                 </Form.Group>
                             </Form.Row>
+                            <Form.Row>
+                                <Form.Group as={Col} controlId="formSendImg">
+                                    <Form.Label>Images</Form.Label>
+                                    <Form.Control required autoComplete="off"
+                                        type="file" name="files"
+                                        multiple
+                                        value={images}
+                                        onChange={this.handleChange}
+                                        className="form" />
+                                </Form.Group>
+                            </Form.Row>
                         </Card.Body>
                     </Form>
                 </Card>
-                { " "}
+                { " " }
                 <div className="App">
                     <button type="submit" onClick={this.makePostRequests} class="btn btn-dark">Get your offer</button>
                 </div>

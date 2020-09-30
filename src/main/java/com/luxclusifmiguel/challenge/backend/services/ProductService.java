@@ -1,5 +1,7 @@
 package com.luxclusifmiguel.challenge.backend.services;
 
+import com.luxclusifmiguel.challenge.backend.exceptions.ImageNotFoundException;
+import com.luxclusifmiguel.challenge.backend.model.Image;
 import com.luxclusifmiguel.challenge.backend.model.Product;
 
 /**
@@ -14,5 +16,9 @@ public interface ProductService {
      * @return the product
      */
     Product get(Integer id);
+
+    Image addImage(Integer productId, Image image) throws ImageNotFoundException;
+
+    void removeImage(Integer productId, Integer imageId) throws ImageNotFoundException;
 
 }

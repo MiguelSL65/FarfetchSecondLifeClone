@@ -1,6 +1,7 @@
 package com.luxclusifmiguel.challenge.backend.converters;
 
 import com.luxclusifmiguel.challenge.backend.dto.ProductDto;
+import com.luxclusifmiguel.challenge.backend.model.Product;
 import com.luxclusifmiguel.challenge.backend.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
@@ -31,9 +32,9 @@ public class ProductDtoToProduct extends AbstractConverter<ProductDto, com.luxcl
      * @return the product object model
      */
     @Override
-    public com.luxclusifmiguel.challenge.backend.model.Product convert(ProductDto productDto) {
+    public Product convert(ProductDto productDto) {
 
-        com.luxclusifmiguel.challenge.backend.model.Product product = (productDto.getId() != null ? productService.get(productDto.getId()) : new com.luxclusifmiguel.challenge.backend.model.Product());
+        Product product = (productDto.getId() != null ? productService.get(productDto.getId()) : new Product());
 
         product.setBrand(productDto.getBrand());
         product.setCondition(productDto.getCondition());

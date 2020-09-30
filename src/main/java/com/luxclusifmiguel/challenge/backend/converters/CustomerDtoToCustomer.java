@@ -1,16 +1,17 @@
 package com.luxclusifmiguel.challenge.backend.converters;
 
 import com.luxclusifmiguel.challenge.backend.dto.CustomerDto;
+import com.luxclusifmiguel.challenge.backend.model.Customer;
 import com.luxclusifmiguel.challenge.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * The {@link Converter} implementation, responsible for {@link CustomerDto} to {@link com.luxclusifmiguel.challenge.backend.model.Customer} type conversion
+ * The {@link Converter} implementation, responsible for {@link CustomerDto} to {@link Customer} type conversion
  */
 @Component
-public class CustomerDtoToCustomer extends AbstractConverter<CustomerDto, com.luxclusifmiguel.challenge.backend.model.Customer> {
+public class CustomerDtoToCustomer extends AbstractConverter<CustomerDto, Customer> {
 
     private UserService userService;
 
@@ -31,9 +32,9 @@ public class CustomerDtoToCustomer extends AbstractConverter<CustomerDto, com.lu
      * @return the customer
      */
     @Override
-    public com.luxclusifmiguel.challenge.backend.model.Customer convert(CustomerDto customerDto) {
+    public Customer convert(CustomerDto customerDto) {
 
-        com.luxclusifmiguel.challenge.backend.model.Customer customer = (customerDto.getId() != null ? userService.get(customerDto.getId()) : new com.luxclusifmiguel.challenge.backend.model.Customer());
+        Customer customer = (customerDto.getId() != null ? userService.get(customerDto.getId()) : new Customer());
 
         customer.setFirstName(customerDto.getFirstName());
         customer.setLastName(customerDto.getLastName());

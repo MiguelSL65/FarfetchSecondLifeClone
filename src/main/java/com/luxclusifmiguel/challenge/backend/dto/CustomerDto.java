@@ -5,7 +5,7 @@ import com.luxclusifmiguel.challenge.backend.model.Customer;
 import javax.validation.constraints.*;
 
 /**
- * The {@link com.luxclusifmiguel.challenge.backend.model.Customer} data transfer object
+ * The {@link Customer} data transfer object
  */
 public class CustomerDto {
 

@@ -1,19 +1,17 @@
 import React, { Component } from "react";
-import logo from './logo.svg';
 import './App.css';
 
 import { 
   BrowserRouter as Router,
   Route, 
   Switch, 
-  Link, 
   Redirect 
  } from "react-router-dom"; 
 
  // pages
- import MainPage from "./pages";
- import NotFoundPage from "./pages/404";
- import SellingForm from "./pages/form";
+ import MainPage from "./components/index";
+ import NotFoundPage from "./components/404";
+ import SellingForm from "./components/form";
 
 class App extends Component {
   render () {

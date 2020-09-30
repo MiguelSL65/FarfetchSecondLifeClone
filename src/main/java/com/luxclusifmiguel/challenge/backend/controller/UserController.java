@@ -5,6 +5,7 @@ import com.luxclusifmiguel.challenge.backend.converters.CustomerToCustomerDto;
 import com.luxclusifmiguel.challenge.backend.dto.CustomerDto;
 import com.luxclusifmiguel.challenge.backend.exceptions.AssociationExistsException;
 import com.luxclusifmiguel.challenge.backend.exceptions.UserNotFoundException;
+import com.luxclusifmiguel.challenge.backend.model.Customer;
 import com.luxclusifmiguel.challenge.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *  REST controller responsible for {@link com.luxclusifmiguel.challenge.backend.model.Customer} related CRUD operations
+ *  REST controller responsible for {@link Customer} related CRUD operations
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -83,9 +84,9 @@ public class UserController {
      * @return the response entity
      */
     @GetMapping("/{id}")
-    public ResponseEntity<com.luxclusifmiguel.challenge.backend.model.Customer> showUser(@PathVariable Integer id) {
+    public ResponseEntity<Customer> showUser(@PathVariable Integer id) {
 
-        com.luxclusifmiguel.challenge.backend.model.Customer user = userService.get(id);
+        Customer user = userService.get(id);
 
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -110,7 +111,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        com.luxclusifmiguel.challenge.backend.model.Customer savedUser = userService.save(customerDtoToCustomer.convert(customerDto));
+        Customer savedUser = userService.save(customerDtoToCustomer.convert(customerDto));
 
         // get help from the framework building the path for the newly created resource
         UriComponents uriComponents = uriComponentsBuilder.path("/api/user/" + savedUser.getId()).build();

@@ -1,8 +1,11 @@
 package com.luxclusifmiguel.challenge.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.cfg.ImprovedNamingStrategy;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The product model entity
@@ -19,6 +22,23 @@ public class Product extends AbstractModel {
     @JsonIgnore
     @ManyToOne
     private Customer customer;
+
+    @JsonIgnore
+    @OneToMany(
+            // propagate changes on customer entity to account entities
+            cascade = {CascadeType.ALL},
+
+            // remove products if unlinked from user (?)
+            orphanRemoval = true,
+
+            // foreign key on product table to establish the
+            // many-to-one relationship
+            mappedBy = "product",
+
+            // fetch products from database together with customer
+            fetch = FetchType.EAGER
+    )
+    private List<Image> images = new ArrayList<>();
 
     /**
      *  Gets the user associated with this product
@@ -90,6 +110,20 @@ public class Product extends AbstractModel {
      */
     public void setSize(String size) {
         this.size = size;
+    }
+
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void addImage(Image image) {
+        images.add(image);
+        image.setProduct(this);
+    }
+
+    public void removeImage(Image image) {
+        images.remove(image);
+        image.setProduct(null);
     }
 
     /**
