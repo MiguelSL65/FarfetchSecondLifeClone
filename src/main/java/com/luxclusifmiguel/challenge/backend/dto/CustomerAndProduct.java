@@ -1,4 +1,4 @@
-package com.luxclusifmiguel.challenge.backend.util;
+package com.luxclusifmiguel.challenge.backend.dto;
 
 import com.luxclusifmiguel.challenge.backend.model.Customer;
 import com.luxclusifmiguel.challenge.backend.model.Product;
@@ -18,6 +18,9 @@ public class CustomerAndProduct {
     @NotNull
     @NotBlank
     private Product product;
+
+    public CustomerAndProduct() {
+    }
 
     public CustomerAndProduct(Customer customer, Product product) {
         this.customer = customer;

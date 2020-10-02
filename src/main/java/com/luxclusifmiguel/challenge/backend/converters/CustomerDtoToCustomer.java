@@ -2,7 +2,7 @@ package com.luxclusifmiguel.challenge.backend.converters;
 
 import com.luxclusifmiguel.challenge.backend.dto.CustomerDto;
 import com.luxclusifmiguel.challenge.backend.model.Customer;
-import com.luxclusifmiguel.challenge.backend.services.UserService;
+import com.luxclusifmiguel.challenge.backend.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -13,16 +13,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomerDtoToCustomer extends AbstractConverter<CustomerDto, Customer> {
 
-    private UserService userService;
+    private CustomerService customerService;
 
     /**
      * Sets the user service
      *
-     * @param userService the service to set
+     * @param customerService the service to set
      */
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setCustomerService(CustomerService customerService) {
+        this.customerService = customerService;
     }
 
     /**
@@ -34,7 +34,7 @@ public class CustomerDtoToCustomer extends AbstractConverter<CustomerDto, Custom
     @Override
     public Customer convert(CustomerDto customerDto) {
 
-        Customer customer = (customerDto.getId() != null ? userService.get(customerDto.getId()) : new Customer());
+        Customer customer = (customerDto.getId() != null ? customerService.get(customerDto.getId()) : new Customer());
 
         customer.setFirstName(customerDto.getFirstName());
         customer.setLastName(customerDto.getLastName());

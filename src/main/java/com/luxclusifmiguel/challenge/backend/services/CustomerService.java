@@ -9,53 +9,53 @@ import com.luxclusifmiguel.challenge.backend.model.Customer;
 import java.util.List;
 
 /**
- *  Common interface for user services - provides methods to manage users
+ *  Common interface for customer services - provides methods to manage customers
  */
-public interface UserService {
+public interface CustomerService {
 
     /**
-     *  Gets the user with the given id
+     *  Gets the customer with the given id
      *
-     * @param id the user id
-     * @return the user
+     * @param id the customer id
+     * @return the customer
      */
     Customer get(Integer id);
 
     /**
-     *  Saves a user
+     *  Saves a customer
      *
-     * @param user  the user to save
-     * @return the saved user
+     * @param user  the customer to save
+     * @return the saved customer
      */
     Customer save(Customer user);
 
     /**
-     *  Deletes a user by id
+     *  Deletes a customer by id
      *
-     * @param id the user id
+     * @param id the customer id
      */
     void delete(Integer id) throws UserNotFoundException, AssociationExistsException;
 
     /**
-     *  Gets a list of users
+     *  Gets a list of customer
      *
-     * @return the users list
+     * @return the customer list
      */
     List<Customer> usersList();
 
     /**
-     *  Adds a product to a user
+     *  Adds a product to a customer
      *
-     * @param id        the user id
+     * @param id        the customer id
      * @param product   the product
-     * @return
+     * @return the product added
      */
     Product addProduct(Integer id, Product product) throws UserNotFoundException;
 
     /**
      *  Removes a product from the customer
      *
-     * @param id            the user id
+     * @param id            the customer id
      * @param productId     the product id
      */
     void removeProduct(Integer id, Integer productId) throws UserNotFoundException, ProductNotFoundException;

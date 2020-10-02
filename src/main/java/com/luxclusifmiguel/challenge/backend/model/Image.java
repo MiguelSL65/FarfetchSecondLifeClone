@@ -2,22 +2,16 @@ package com.luxclusifmiguel.challenge.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  *  The image model entity
  */
 @Entity
-public class Image extends AbstractModel {
+public class Image extends AbstractModel{
 
     private String fileName;
     private String fileType;
-
-    @Lob
-    private String imageUrl;
 
     @JsonIgnore
     @ManyToOne
@@ -26,10 +20,9 @@ public class Image extends AbstractModel {
     public Image() {
     }
 
-    public Image(String fileName, String fileType, String imageUrl) {
+    public Image(String fileName, String fileType) {
         this.fileName = fileName;
         this.fileType = fileType;
-        this.imageUrl = imageUrl;
     }
 
     /**
@@ -69,27 +62,19 @@ public class Image extends AbstractModel {
     }
 
     /**
-     *  Gets the image data bytes
+     * Sets the product
      *
-     * @return image URL
+     * @param product the product to set
      */
-    public String getImageUrl() {
-        return this.imageUrl;
-    }
-
-    /**
-     *  Sets the image data bytes
-     *
-     * @param imageUrl the URL to set
-     */
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
     public void setProduct(Product product) {
         this.product = product;
     }
 
+    /**
+     * Gets the product
+     *
+     * @return the product
+     */
     public Product getProduct() {
         return this.product;
     }
@@ -102,8 +87,7 @@ public class Image extends AbstractModel {
         return "Image{" +
                 "fileName='" + fileName + '\'' +
                 ", fileType='" + fileType + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
+                ", product=" + product +
                 '}';
     }
-
 }

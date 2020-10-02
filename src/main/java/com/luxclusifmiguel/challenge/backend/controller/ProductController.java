@@ -7,12 +7,10 @@ import com.luxclusifmiguel.challenge.backend.exceptions.UserNotFoundException;
 import com.luxclusifmiguel.challenge.backend.model.Customer;
 import com.luxclusifmiguel.challenge.backend.model.Product;
 import com.luxclusifmiguel.challenge.backend.services.ProductService;
-import com.luxclusifmiguel.challenge.backend.services.UserService;
-import com.luxclusifmiguel.challenge.backend.util.CustomerAndProduct;
+import com.luxclusifmiguel.challenge.backend.services.CustomerService;
+import com.luxclusifmiguel.challenge.backend.dto.CustomerAndProduct;
 import com.luxclusifmiguel.challenge.backend.util.SheetsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,14 +20,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * REST controller responsible for {@link com.luxclusifmiguel.challenge.backend.model.Product} related CRUD operations
+ * REST controller responsible for {@link Product} related CRUD operations
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
 
-    private UserService userService;
+    private CustomerService customerService;
     private ProductService productService;
     private ProductDtoToProduct productDtoToProduct;
     private ProductToProductDto productToProductDto;
@@ -55,13 +53,13 @@ public class ProductController {
     }
 
     /**
-     * Sets the user service
+     * Sets the customer service
      *
-     * @param userService the user service to set
+     * @param customerService the customer service to set
      */
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setCustomerService(CustomerService customerService) {
+        this.customerService = customerService;
     }
 
     /**
@@ -74,85 +72,83 @@ public class ProductController {
         this.productService = productService;
     }
 
-    /**
-     * Retrieves a representation of the given user products
-     *
-     * @param uid the user id
-     * @return the response entity
-     */
-    @GetMapping("/{uid}/product")
-    public ResponseEntity<List<ProductDto>> listUserProducts(@PathVariable Integer uid) {
+    @GetMapping("/")
+    private List<ProductDto> listAllProducts() {
 
-        Customer customer = userService.get(uid);
-
-        if (customer == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        List<ProductDto> productDtos = customer.getProducts()
-                .stream()
+        return productService.productsList().stream()
                 .map(product -> productToProductDto.convert(product))
                 .collect(Collectors.toList());
-
-        return new ResponseEntity<>(productDtos, HttpStatus.OK);
     }
 
     /**
-     * Retrives a representation of the user product
+     * Retrieves a representation of the given user products
      *
-     * @param uid the user id
+     * @param cid the customer id
+     * @return the response entity
+     */
+    @GetMapping("/all-products/{cid}")
+    private List<ProductDto> listUserProducts(@PathVariable Integer cid) throws UserNotFoundException {
+
+        Customer customer = customerService.get(cid);
+
+        if (customer == null) {
+            throw new UserNotFoundException();
+        }
+
+        return customer.getProducts()
+                .stream()
+                .map(product -> productToProductDto.convert(product))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves a representation of the user product
+     *
      * @param pid the product id
      * @return the response entity
      */
-    @GetMapping("/{uid}/product/{pid}")
-    public ResponseEntity<ProductDto> showUserProduct(@PathVariable Integer uid, @PathVariable Integer pid) {
+    @GetMapping("/{pid}")
+    private ProductDto showUserProduct(@PathVariable Integer pid) throws ProductNotFoundException {
 
         Product product = productService.get(pid);
 
         if (product == null || product.getUser() == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ProductNotFoundException();
         }
 
-        if (!product.getUser().getId().equals(uid)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<>(productToProductDto.convert(product), HttpStatus.OK);
+        return productToProductDto.convert(product);
     }
 
     /**
      * Adds a product
      *
-     * @param uid the customer id
+     * @param cid the customer id
      * @param productDto the product DTO
      * @return the response entity
      */
     @PostMapping("/{uid}")
-    public Product addProduct(@PathVariable Integer uid, @Valid @RequestBody ProductDto productDto)
+    private Product addProduct(@PathVariable Integer cid, @Valid @RequestBody ProductDto productDto)
             throws UserNotFoundException {
 
-            return userService.addProduct(uid, productDtoToProduct.convert(productDto));
+            return customerService.addProduct(cid, productDtoToProduct.convert(productDto));
     }
 
     /**
-     * Adds a product and a customer
+     * Adds a product and a customer received on the frontend form
      *
      * @param customerAndProduct the customer and product DTO
      * @return the customer and product added
-     * @throws UserNotFoundException
-     * @throws IOException
-     * @throws GeneralSecurityException
      */
     @PostMapping("/add")
-    public CustomerAndProduct addFormData
-            (@Valid @RequestBody CustomerAndProduct customerAndProduct)
+    private CustomerAndProduct addFormData
+            (@RequestBody CustomerAndProduct customerAndProduct)
             throws UserNotFoundException, IOException, GeneralSecurityException {
 
             Customer customer = customerAndProduct.getCustomer();
             Product product = customerAndProduct.getProduct();
 
-            userService.save(customer);
-            userService.addProduct(customer.getId(), product);
+            customerService.save(customerAndProduct.getCustomer());
+            customerService.addProduct(customer.getId(), product);
 
             // add to google sheets
             SheetsUtil.addToSheet(customer, product);
@@ -163,13 +159,13 @@ public class ProductController {
     /**
      * Removes a product
      *
-     * @param uid the user id
+     * @param cid the customer id
      * @param pid the product id
      */
-    @GetMapping("/{uid}/products/{pid}/remove")
-    public void removeProduct(@PathVariable Integer uid, @PathVariable Integer pid)
+    @GetMapping("/remove/{cid}/{pid}")
+    private void removeProduct(@PathVariable Integer cid, @PathVariable Integer pid)
             throws UserNotFoundException, ProductNotFoundException {
 
-            userService.removeProduct(uid, pid);
+            customerService.removeProduct(cid, pid);
     }
 }

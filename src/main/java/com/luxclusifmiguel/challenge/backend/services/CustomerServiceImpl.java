@@ -1,6 +1,5 @@
 package com.luxclusifmiguel.challenge.backend.services;
 
-
 import com.luxclusifmiguel.challenge.backend.exceptions.AssociationExistsException;
 import com.luxclusifmiguel.challenge.backend.exceptions.ProductNotFoundException;
 import com.luxclusifmiguel.challenge.backend.exceptions.UserNotFoundException;
@@ -15,22 +14,22 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * An {@link UserService} implementation
+ * An {@link CustomerService} implementation
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class CustomerServiceImpl implements CustomerService {
 
-    private CustomerDao userDao;
+    private CustomerDao customerDao;
     private ProductDao productDao;
 
     /**
-     *  Sets the user data access object
+     *  Sets the customer data access object
      *
-     * @param userDao the user DAO to set
+     * @param customerDao the customer DAO to set
      */
     @Autowired
-    public void setUserDao(CustomerDao userDao) {
-        this.userDao = userDao;
+    public void setCustomerDao(CustomerDao customerDao) {
+        this.customerDao = customerDao;
     }
 
     /**
@@ -44,68 +43,68 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * @see UserService#get(Integer)
+     * @see CustomerService#get(Integer)
      */
     @Override
     public Customer get(Integer id) {
-        return userDao.findById(id).get();
+        return customerDao.findById(id).get();
     }
 
     /**
-     * @see UserService#save(Customer)
+     * @see CustomerService#save(Customer)
      */
     @Override
     public Customer save(Customer user) {
-        return userDao.save(user);
+        return customerDao.save(user);
     }
 
     /**
-     * @see UserService#delete(Integer)
+     * @see CustomerService#delete(Integer)
      */
     @Override
     public void delete(Integer id) throws UserNotFoundException, AssociationExistsException {
 
-        Customer user = Optional.of(userDao.findById(id).get())
+        Customer user = Optional.of(customerDao.findById(id).get())
                 .orElseThrow(UserNotFoundException::new);
 
         if (!user.getProducts().isEmpty()) {
             throw new AssociationExistsException();
         }
 
-        userDao.deleteById(id);
+        customerDao.deleteById(id);
     }
 
     /**
-     * @see UserService#usersList()
+     * @see CustomerService#usersList()
      */
     @Override
     public List<Customer> usersList() {
-        return userDao.findAll();
+        return customerDao.findAll();
     }
 
     /**
-     * @see UserService#addProduct(Integer, Product)
+     * @see CustomerService#addProduct(Integer, Product)
      */
     @Override
     public Product addProduct(Integer id, Product product) throws UserNotFoundException {
 
-        Customer user = Optional.of(userDao.findById(id).get())
+        Customer user = Optional.of(customerDao.findById(id).get())
                 .orElseThrow(UserNotFoundException::new);
 
         user.addProduct(product);
-        userDao.save(user);
+        customerDao.save(user);
 
         return user.getProducts().get(user.getProducts().size() - 1);
     }
 
     /**
-     * @see UserService#removeProduct(Integer, Integer)
+     * @see CustomerService#removeProduct(Integer, Integer)
      */
     @Override
     public void removeProduct(Integer id, Integer productId) throws UserNotFoundException,
             ProductNotFoundException {
 
-        Customer user = Optional.of(userDao.findById(id).get())
+        Customer user = Optional.of(customerDao.findById(id).get())
                 .orElseThrow(UserNotFoundException::new);
 
         Product product = Optional.of(productDao.findById(productId).get())
@@ -116,6 +115,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user.removeProduct(product);
-        userDao.save(user);
+        productDao.delete(product);
+        customerDao.save(user);
     }
 }

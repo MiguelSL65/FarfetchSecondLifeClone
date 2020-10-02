@@ -116,11 +116,21 @@ public class Product extends AbstractModel {
         return images;
     }
 
+    /**
+     * Adds an image
+     *
+     * @param image the image to add
+     */
     public void addImage(Image image) {
         images.add(image);
         image.setProduct(this);
     }
 
+    /**
+     * Removes an image
+     *
+     * @param image the image to remove
+     */
     public void removeImage(Image image) {
         images.remove(image);
         image.setProduct(null);
@@ -135,7 +145,8 @@ public class Product extends AbstractModel {
                 "brand='" + brand + '\'' +
                 ", condition='" + condition + '\'' +
                 ", size='" + size + '\'' +
-                ", user=" + customer +
+                ", customer=" + customer +
+                ", images=" + images +
                 '}';
     }
 }

@@ -5,10 +5,10 @@ import com.luxclusifmiguel.challenge.backend.model.Image;
 import com.luxclusifmiguel.challenge.backend.model.Product;
 import com.luxclusifmiguel.challenge.backend.persistence.ImageDao;
 import com.luxclusifmiguel.challenge.backend.persistence.ProductDao;
-import com.luxclusifmiguel.challenge.backend.persistence.CustomerDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -21,7 +21,7 @@ public class ProductServiceImpl implements ProductService{
     private ProductDao productDao;
 
     /**
-     *  Sets the user data access object
+     *  Sets the image data access object
      *
      * @param imageDao the image DAO to set
      */
@@ -49,15 +49,20 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Image addImage(Integer productId, Image image) throws ImageNotFoundException {
+    public List<Product> productsList() {
+        return productDao.findAll();
+    }
 
-        Product product = Optional.of(productDao.findById(productId).get())
-                .orElseThrow(ImageNotFoundException::new);
+    @Override
+    public void addImage(Integer productId, Image image) throws ImageNotFoundException {
+
+        assert productId != null;
+        Product product = productDao.findById(productId).get();
 
         product.addImage(image);
         productDao.save(product);
 
-        return product.getImages().get(product.getImages().size() - 1);
+        product.getImages().get(product.getImages().size() - 1);
     }
 
     @Override

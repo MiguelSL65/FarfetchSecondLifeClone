@@ -8,10 +8,10 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * A {@link Converter} implementation, responsible for {@link ProductDto} to {@link com.luxclusifmiguel.challenge.backend.model.Product} type conversion
+ * A {@link Converter} implementation, responsible for {@link ProductDto} to {@link Product} type conversion
  */
 @Component
-public class ProductDtoToProduct extends AbstractConverter<ProductDto, com.luxclusifmiguel.challenge.backend.model.Product> {
+public class ProductDtoToProduct extends AbstractConverter<ProductDto, Product> {
 
     private ProductService productService;
 

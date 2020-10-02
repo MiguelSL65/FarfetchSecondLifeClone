@@ -1,5 +1,6 @@
 package com.luxclusifmiguel.challenge.backend.persistence;
 
+import com.luxclusifmiguel.challenge.backend.model.Image;
 import com.luxclusifmiguel.challenge.backend.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -9,5 +10,4 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ProductDao extends JpaRepository<Product, Integer> {
-
 }

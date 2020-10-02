@@ -6,26 +6,20 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.InputStreamContent;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.luxclusifmiguel.challenge.backend.model.Customer;
 import com.luxclusifmiguel.challenge.backend.model.Product;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,7 +46,7 @@ public class SheetsUtil {
                 JacksonFactory.getDefaultInstance(), new InputStreamReader(in)
         );
 
-        List<String> scopes = Arrays.asList(SheetsScopes.SPREADSHEETS);
+        List<String> scopes = Arrays.asList(SheetsScopes.SPREADSHEETS, DriveScopes.DRIVE_FILE);
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(),
@@ -70,8 +64,6 @@ public class SheetsUtil {
      * Gets the sheet service
      *
      * @return the sheet
-     * @throws IOException
-     * @throws GeneralSecurityException
      */
     private static Sheets getSheetsService() throws IOException, GeneralSecurityException {
         Credential credential = authorize();
@@ -86,8 +78,6 @@ public class SheetsUtil {
      *
      * @param customer customer info to be written
      * @param product product ingo to be written
-     * @throws IOException
-     * @throws GeneralSecurityException
      */
     public static void addToSheet(Customer customer, Product product)
             throws IOException, GeneralSecurityException {
@@ -109,46 +99,6 @@ public class SheetsUtil {
                 .execute();
     }
 
-    /**
-     * Get google drive service
-     *
-     * @return the Drive
-     * @throws IOException
-     * @throws GeneralSecurityException
-     */
-    private static Drive getDriveServices() throws IOException, GeneralSecurityException {
-
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-
-        // instantiating a client
-        return new Drive.Builder(HTTP_TRANSPORT, JacksonFactory.getDefaultInstance(), authorize())
-                .setApplicationName(APPLICATION_NAME)
-                .build();
-    }
-
-    /**
-     * Writes a file to a google driver folder
-     *
-     * @param multipartFile the file to write
-     * @throws IOException
-     * @throws GeneralSecurityException
-     */
-    public static void addToDrive(MultipartFile multipartFile) throws IOException, GeneralSecurityException {
-
-        File fileMetadata = new File();
-        fileMetadata.setName(multipartFile.getName());
-
-        fileMetadata.setParents(Collections.singletonList("images"));
-        fileMetadata.setMimeType("application/photo");
-
-        byte[] photoBytes = Base64.getDecoder().decode(multipartFile.getBytes());
-        InputStream inputStream = new ByteArrayInputStream(photoBytes);
-        InputStreamContent mediaContent = new InputStreamContent("application/photo", inputStream);
-
-        getDriveServices().files().create(fileMetadata, mediaContent)
-                .setSupportsTeamDrives(true)
-                .execute();
-    }
 
 
 }

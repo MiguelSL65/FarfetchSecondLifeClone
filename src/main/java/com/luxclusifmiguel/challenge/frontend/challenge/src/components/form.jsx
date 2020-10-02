@@ -23,7 +23,7 @@ class SellingForm extends Component {
         brand: "",
         condition: "",
         size: "",
-        images: []
+        image: ""
     }
 
     resetForm = () => {
@@ -83,7 +83,9 @@ class SellingForm extends Component {
                     <Button variant="light" align="left" className="mr-2">Home page</Button>
                 </Link>
                 <Card className="App">
-                    <Form onReset={this.resetForm} onSubmit={this.makePostRequests} id="form">
+                    <Form onReset={this.resetForm} onSubmit={this.makePostRequests} id="form"
+                        encType="multipart/form-data"
+                    >
                         <Card.Body>
                             <Form.Row>
                                 <Form.Group as={Col} controlId="formGridFirstName">
