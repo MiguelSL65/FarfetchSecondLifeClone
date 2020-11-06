@@ -32,7 +32,7 @@ public interface ProductService {
      * @param productId the product id
      * @param image the image
      */
-    void addImage(Integer productId, Image image) throws ImageNotFoundException;
+    Image addImage(Integer productId, Image image) throws ImageNotFoundException;
 
     /**
      * Removes an image from a product

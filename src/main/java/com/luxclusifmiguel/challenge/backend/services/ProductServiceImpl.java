@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public void addImage(Integer productId, Image image) throws ImageNotFoundException {
+    public Image addImage(Integer productId, Image image) throws ImageNotFoundException {
 
         assert productId != null;
         Product product = productDao.findById(productId).get();
@@ -62,7 +62,7 @@ public class ProductServiceImpl implements ProductService{
         product.addImage(image);
         productDao.save(product);
 
-        product.getImages().get(product.getImages().size() - 1);
+        return product.getImages().get(product.getImages().size() - 1);
     }
 
     @Override
@@ -74,11 +74,12 @@ public class ProductServiceImpl implements ProductService{
         Image image = Optional.of(imageDao.findById(imageId).get())
                 .orElseThrow(ImageNotFoundException::new);
 
-        if (image.getProduct().getId().equals(productId)) {
+        if (!image.getProduct().getId().equals(productId)) {
             throw new ImageNotFoundException();
         }
 
         product.removeImage(image);
+        imageDao.deleteById(imageId);
         productDao.save(product);
     }
 }

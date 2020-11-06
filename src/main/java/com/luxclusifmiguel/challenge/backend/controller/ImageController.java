@@ -10,7 +10,9 @@ import com.luxclusifmiguel.challenge.backend.model.Product;
 import com.luxclusifmiguel.challenge.backend.services.ImageService;
 import com.luxclusifmiguel.challenge.backend.services.ProductService;
 import com.luxclusifmiguel.challenge.backend.util.GoogleDriveUtil;
+import com.luxclusifmiguel.challenge.backend.util.SheetsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,13 +66,15 @@ public class ImageController {
      * @param file the image received
      * @return the image
      */
-    @PostMapping("/addfile")
-    private MultipartFile addImage(@RequestBody MultipartFile file) throws IOException, ImageNotFoundException, GeneralSecurityException {
+    @PostMapping(value = "/addfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    private MultipartFile addImage(@RequestParam MultipartFile file) throws IOException, ImageNotFoundException,
+            GeneralSecurityException {
 
-        //imageService.saveFile(file);
-        imageService.storeFile(file);
+        imageService.saveFile(file);
+        Image image = imageService.storeFile(file);
 
-        //GoogleDriveUtil.addToDrive(file);
+        SheetsUtil.addToSheet(image);
+        GoogleDriveUtil.addToDrive(file);
 
         return file;
     }

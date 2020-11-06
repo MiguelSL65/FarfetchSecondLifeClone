@@ -5,6 +5,9 @@ import com.luxclusifmiguel.challenge.backend.model.Image;
 import com.luxclusifmiguel.challenge.backend.model.Product;
 import com.luxclusifmiguel.challenge.backend.persistence.ImageDao;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.slf4j.SLF4JLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -25,6 +28,7 @@ public class ImageServiceImpl implements ImageService{
 
     private ImageDao imageDao;
     private ProductService productService;
+    private Logger logger = LoggerFactory.getLogger(SLF4JLogger.DEFAULT_MESSAGE_FACTORY_CLASS);
 
     /**
      * Sets the product service
@@ -66,7 +70,7 @@ public class ImageServiceImpl implements ImageService{
      * @see ImageService#storeFile(MultipartFile)
      */
     @Override
-    public void storeFile(MultipartFile file) throws ImageNotFoundException {
+    public Image storeFile(MultipartFile file) throws ImageNotFoundException {
 
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
@@ -74,7 +78,7 @@ public class ImageServiceImpl implements ImageService{
 
         Product product = productService.get(productService.productsList().size());
 
-        productService.addImage(product.getId(), image);
+        return productService.addImage(product.getId(), image);
     }
 
     /**
@@ -83,7 +87,7 @@ public class ImageServiceImpl implements ImageService{
     @Override
     public void saveFile(MultipartFile file) {
 
-        String path = "C:\\Users\\Migue\\Documents\\uploads";
+        String path = "C:\\Users\\Migue\\Documents\\uploads\\";
 
         File fileToConvert = new File(path + file.getOriginalFilename());
 

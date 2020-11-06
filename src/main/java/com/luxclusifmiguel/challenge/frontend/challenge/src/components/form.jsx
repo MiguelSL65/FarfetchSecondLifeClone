@@ -6,14 +6,7 @@ import axios from "axios";
 
 class SellingForm extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = this.initialState;
-        this.handleChange = this.handleChange.bind(this);
-        this.makePostRequests = this.makePostRequests.bind(this);
-    }
-
-    initialState = {
+    state = {
         userId: "",
         firstName: "",
         lastName: "",
@@ -23,12 +16,28 @@ class SellingForm extends Component {
         brand: "",
         condition: "",
         size: "",
-        image: ""
+        selectedFile: null
     }
 
-    resetForm = () => {
-        this.setState(() => this.initialState);
+    fileSelectHandler = event => {
+        console.log(event.target.files[0]);
+        this.setState({
+            selectedFile: event.target.files[0]
+        })
     }
+
+    /*fileUploadHandler = () => {
+
+        const fd = new FormData();
+        this.selectedFile.forEach(file => {
+            fd.append("image", file)
+        })
+
+        axios.post('http://localhost:8080/api/image/addfile', fd)
+            .then(res => {
+                console.log(res);
+            });
+    }*/
 
     makePostRequests = async () => {
 
@@ -47,23 +56,30 @@ class SellingForm extends Component {
             size: this.state.size
         }
 
-        const imageData = {
-            images: this.state.images
-        }
-
         let params = {
             customer: formData,
             product: productData
         }
 
         await axios.post("http://localhost:8080/api/product/add", params)
-            .then(response => {
-                if (response.data != null) {
-                    this.setState(this.initialState);
-                    alert("Form sent successfully");
-                }
-            })
+            .then(response => console.log(response))
             .catch(error => console.log(error));
+
+        const fd = new FormData();
+        fd.append('file', this.state.selectedFile, this.state.selectedFile.name);
+
+        await axios.post("http://localhost:8080/api/image/addfile", fd)
+        .then(res => {
+
+            if (res.data != null) {
+                console.log(res);
+                window.location.reload();
+                alert("Form sent successfully");
+            }
+
+        })
+            .catch(error => console.log(error));
+
     }
 
     handleChange = event => {
@@ -74,8 +90,6 @@ class SellingForm extends Component {
 
     render() {
 
-        const { firstName, lastName, email, country, phone, brand, condition, size, images } = this.state;
-
         return (
             <div>
                 <h1 align="center">FARFETCH SECOND LIFE.</h1>
@@ -83,8 +97,8 @@ class SellingForm extends Component {
                     <Button variant="light" align="left" className="mr-2">Home page</Button>
                 </Link>
                 <Card className="App">
-                    <Form onReset={this.resetForm} onSubmit={this.makePostRequests} id="form"
-                        encType="multipart/form-data"
+                    <Form id="form"
+                        onSubmit={this.makePostRequests} encType="multipart/form-data"
                     >
                         <Card.Body>
                             <Form.Row>
@@ -92,7 +106,7 @@ class SellingForm extends Component {
                                     <Form.Label>First Name</Form.Label>
                                     <Form.Control required autoComplete="off"
                                         type="text" name="firstName"
-                                        value={firstName}
+                                        value={this.state.firstName}
                                         onChange={this.handleChange}
                                         className="form"
                                         placeholder="Enter first name" />
@@ -101,7 +115,7 @@ class SellingForm extends Component {
                                     <Form.Label>Last Name</Form.Label>
                                     <Form.Control required autoComplete="off"
                                         type="text" name="lastName"
-                                        value={lastName}
+                                        value={this.state.lastName}
                                         onChange={this.handleChange}
                                         className="form"
                                         placeholder="Enter last name" />
@@ -112,7 +126,7 @@ class SellingForm extends Component {
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control required autoComplete="off"
                                         type="email" name="email"
-                                        value={email}
+                                        value={this.state.email}
                                         onChange={this.handleChange}
                                         className="form"
                                         placeholder="something@example.com" />
@@ -121,7 +135,7 @@ class SellingForm extends Component {
                                     <Form.Label>Country</Form.Label>
                                     <Form.Control required autoComplete="off"
                                         type="text" name="country"
-                                        value={country}
+                                        value={this.state.country}
                                         onChange={this.handleChange}
                                         className="form"
                                         placeholder="Enter your country" />
@@ -132,7 +146,7 @@ class SellingForm extends Component {
                                     <Form.Label>Phone Number</Form.Label>
                                     <Form.Control required autoComplete="off"
                                         type="text" name="phone"
-                                        value={phone}
+                                        value={this.state.phone}
                                         onChange={this.handleChange}
                                         className="form"
                                         placeholder="Enter phone number" />
@@ -141,7 +155,7 @@ class SellingForm extends Component {
                                     <Form.Label>Brand</Form.Label>
                                     <Form.Control required autoComplete="off"
                                         type="text" name="brand"
-                                        value={brand}
+                                        value={this.state.brand}
                                         onChange={this.handleChange}
                                         className="form"
                                         placeholder="Enter your bag's brand" />
@@ -152,7 +166,7 @@ class SellingForm extends Component {
                                     <Form.Label>Condition</Form.Label>
                                     <Form.Control required autoComplete="off"
                                         type="text" name="condition"
-                                        value={condition}
+                                        value={this.state.condition}
                                         onChange={this.handleChange}
                                         className="form"
                                         placeholder="Very good, good, excelent" />
@@ -161,7 +175,7 @@ class SellingForm extends Component {
                                     <Form.Label>Size</Form.Label>
                                     <Form.Control required autoComplete="off"
                                         type="text" name="size"
-                                        value={size}
+                                        value={this.state.size}
                                         onChange={this.handleChange}
                                         className="form"
                                         placeholder="Small, Medium, Large" />
@@ -173,15 +187,15 @@ class SellingForm extends Component {
                                     <Form.Control required autoComplete="off"
                                         type="file" name="files"
                                         multiple
-                                        value={images}
-                                        onChange={this.handleChange}
+                                        value={this.state.files}
+                                        onChange={this.fileSelectHandler}
                                         className="form" />
                                 </Form.Group>
                             </Form.Row>
                         </Card.Body>
                     </Form>
                 </Card>
-                { " " }
+                { " "}
                 <div className="App">
                     <button type="submit" onClick={this.makePostRequests} class="btn btn-dark">Get your offer</button>
                 </div>

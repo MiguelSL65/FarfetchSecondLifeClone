@@ -82,7 +82,8 @@ public class GoogleDriveUtil {
         fileMetadata.setParents(Collections.singletonList(folderId));
         //fileMetadata.setMimeType("application/vnd.google-apps.photo");
 
-        FileContent mediaContent = new FileContent("image/jpeg", new java.io.File(multipartFile.getName()));
+        FileContent mediaContent = new FileContent("image/jpeg",
+                new java.io.File("C:\\Users\\Migue\\Documents\\uploads\\" + multipartFile.getOriginalFilename()));
 
         getDriveServices().files().create(fileMetadata, mediaContent)
                 .setSupportsTeamDrives(true)

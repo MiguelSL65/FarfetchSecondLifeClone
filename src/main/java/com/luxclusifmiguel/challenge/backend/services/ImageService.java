@@ -40,5 +40,5 @@ public interface ImageService {
      *
      * @param file the file to save
      */
-    void storeFile(MultipartFile file) throws IOException, ImageNotFoundException;
+    Image storeFile(MultipartFile file) throws IOException, ImageNotFoundException;
 }

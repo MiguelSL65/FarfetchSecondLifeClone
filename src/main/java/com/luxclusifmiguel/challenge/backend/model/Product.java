@@ -1,7 +1,6 @@
 package com.luxclusifmiguel.challenge.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.cfg.ImprovedNamingStrategy;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class Product extends AbstractModel {
 
     @JsonIgnore
     @OneToMany(
-            // propagate changes on customer entity to account entities
+            // propagate changes on customer entity to product entities
             cascade = {CascadeType.ALL},
 
             // remove products if unlinked from user (?)

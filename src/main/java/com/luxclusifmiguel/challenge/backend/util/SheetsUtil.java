@@ -13,6 +13,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.luxclusifmiguel.challenge.backend.model.Customer;
+import com.luxclusifmiguel.challenge.backend.model.Image;
 import com.luxclusifmiguel.challenge.backend.model.Product;
 
 import java.io.IOException;
@@ -99,6 +100,22 @@ public class SheetsUtil {
                 .execute();
     }
 
+    public static void addToSheet(Image image)
+            throws IOException, GeneralSecurityException {
 
+        Sheets sheetsService = SheetsUtil.getSheetsService();
+
+        ValueRange appendBody = new ValueRange()
+                .setValues(Collections.singletonList(
+                        Arrays.asList(image.getFileName(), image.getFileType())
+                ));
+
+        sheetsService.spreadsheets().values()
+                .append(SheetsUtil.SPREADSHEET_ID, "challenge", appendBody)
+                .setValueInputOption("USER_ENTERED")
+                .setInsertDataOption("INSERT_ROWS")
+                .setIncludeValuesInResponse(true)
+                .execute();
+    }
 
 }

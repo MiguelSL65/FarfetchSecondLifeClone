@@ -126,7 +126,7 @@ public class ProductController {
      * @param productDto the product DTO
      * @return the response entity
      */
-    @PostMapping("/{uid}")
+    @PostMapping("/{cid}")
     private Product addProduct(@PathVariable Integer cid, @Valid @RequestBody ProductDto productDto)
             throws UserNotFoundException {
 

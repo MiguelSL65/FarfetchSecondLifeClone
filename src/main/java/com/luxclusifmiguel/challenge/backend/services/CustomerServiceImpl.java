@@ -104,15 +104,16 @@ public class CustomerServiceImpl implements CustomerService {
     public void removeProduct(Integer id, Integer productId) throws UserNotFoundException,
             ProductNotFoundException {
 
-        Customer user = Optional.of(customerDao.findById(id).get())
-                .orElseThrow(UserNotFoundException::new);
-
         Product product = Optional.of(productDao.findById(productId).get())
                 .orElseThrow(ProductNotFoundException::new);
 
-        if (!product.getUser().getId().equals(id)) {
-            throw new ProductNotFoundException();
-        }
+        /*if (id == 0) {
+            productDao.delete(product);
+            return;
+        }*/
+
+        Customer user = Optional.of(customerDao.findById(id).get())
+                .orElseThrow(UserNotFoundException::new);
 
         user.removeProduct(product);
         productDao.delete(product);
